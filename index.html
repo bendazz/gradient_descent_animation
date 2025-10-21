@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gradient Descent Visualizer (start)</title>
+  <link rel="stylesheet" href="src/styles/main.css" />
+</head>
+<body>
+  <header>
+    <h1>Gradient Descent Visualizer</h1>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="controls">
+      <div class="controls-inner">
+        <label for="csv-params">Paste updates (intercept slope per line, whitespace-separated)</label>
+        <textarea id="csv-params" placeholder="b a\n0.5 0.1\n0.7 0.08\n..." rows="5"></textarea>
+        <div class="controls-actions">
+          <button id="run-animation" type="button">Run Animation</button>
+          <button id="copy-numpy" type="button" class="secondary">Copy NumPy gradient</button>
+          <label class="speed-label" for="speed-ms">Speed</label>
+          <input id="speed-ms" type="range" min="10" max="500" step="10" value="60" aria-label="speed in ms per step" />
+          <button id="pause-resume" type="button" class="secondary">Pause</button>
+          <button id="reset" type="button" class="secondary">Reset</button>
+          <button id="new-points" type="button">New Points</button>
+          <span id="controls-message" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </section>
+    <section class="plots" aria-label="plots">
+      <div class="panel">
+        <canvas id="data-plot" aria-label="data plot: points and y=0"></canvas>
+      </div>
+      <div class="panel">
+        <canvas id="contour-plot" aria-label="contour plot: MSE over (a,b)"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script src="src/js/main.js"></script>
+</body>
+</html>

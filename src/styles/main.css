@@ -1,0 +1,143 @@
+/* Light, uncluttered UI */
+:root {
+  --bg: #fafafa;
+  --fg: #111827;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --line-red: #e11d48;
+  --card: #ffffff;
+  --border: #e5e7eb;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+}
+
+header {
+  text-align: center;
+  padding: 24px 16px 8px;
+}
+
+h1 {
+  margin: 0 0 6px 0;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+main {
+  display: grid;
+  place-items: center;
+  padding: 12px 16px 24px;
+}
+
+.controls {
+  width: min(96vw, 1100px);
+  margin-bottom: 8px;
+}
+.controls-inner {
+  display: grid;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+.controls-inner label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.controls-inner textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font: 14px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  background: #fff;
+}
+.controls-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.controls-actions button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.controls-actions button:hover {
+  filter: brightness(0.95);
+}
+.controls-actions button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.controls-actions button.secondary:hover {
+  background: rgba(37, 99, 235, 0.06);
+}
+.controls-actions #controls-message {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.controls-actions .speed-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+#speed-ms {
+  width: 140px;
+}
+
+.plots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: min(96vw, 1100px);
+}
+
+.panel {
+  display: grid;
+  place-items: center;
+}
+
+canvas#data-plot,
+canvas#contour-plot {
+  width: min(46vw, 520px);
+  height: auto;
+  max-height: 70vh;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 4px 10px rgba(0,0,0,0.04);
+}
+
+@media (max-width: 900px) {
+  .plots {
+    grid-template-columns: 1fr;
+  }
+  canvas#data-plot,
+  canvas#contour-plot {
+    width: min(92vw, 720px);
+  }
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding-bottom: 16px;
+}
