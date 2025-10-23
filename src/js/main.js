@@ -50,6 +50,61 @@
     ctx.strokeStyle = '#e5e7eb';
     ctx.strokeRect(pad, pad, width - 2 * pad, height - 2 * pad);
 
+    // grid lines (light) and axis ticks with labels
+    const gridColor = 'rgba(17,24,39,0.06)'; // very light gray
+    const tickColor = '#9ca3af';
+    const tickLen = 6;
+    const majorStep = 2;
+    const minorStep = 1;
+    const crisp = (v) => Math.round(v) + 0.5; // for crisp 1px lines
+
+    // vertical grid lines x=1..9
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    for (let x = xmin + minorStep; x < xmax; x += minorStep) {
+      const px = crisp(xToPx(x));
+      ctx.beginPath();
+      ctx.moveTo(px, pad);
+      ctx.lineTo(px, height - pad);
+      ctx.stroke();
+    }
+
+    // horizontal grid lines y=1..9
+    for (let y = ymin + minorStep; y < ymax; y += minorStep) {
+      const py = crisp(yToPx(y));
+      ctx.beginPath();
+      ctx.moveTo(pad, py);
+      ctx.lineTo(width - pad, py);
+      ctx.stroke();
+    }
+
+    // axis ticks and labels (every 2 units)
+    ctx.strokeStyle = tickColor;
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif';
+    // bottom axis ticks and labels
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let x = xmin; x <= xmax; x += majorStep) {
+      const px = xToPx(x);
+      ctx.beginPath();
+      ctx.moveTo(crisp(px), height - pad);
+      ctx.lineTo(crisp(px), height - pad + tickLen);
+      ctx.stroke();
+      ctx.fillText(String(x), px, height - pad + tickLen + 2);
+    }
+    // left axis ticks and labels
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let y = ymin; y <= ymax; y += majorStep) {
+      const py = yToPx(y);
+      ctx.beginPath();
+      ctx.moveTo(pad - tickLen, crisp(py));
+      ctx.lineTo(pad, crisp(py));
+      ctx.stroke();
+      ctx.fillText(String(y), pad - tickLen - 4, py);
+    }
+
     // y = 0 line in red
     ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--line-red') || '#e11d48';
     ctx.lineWidth = 2;
@@ -76,17 +131,7 @@
     ctx.lineTo(xToPx(xmax), yToPx(a * xmax + b));
     ctx.stroke();
 
-  // minimal ticks (0 and 10)
-  ctx.fillStyle = '#6b7280';
-  ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.fillText('0', xToPx(0), height - pad + 6);
-  ctx.fillText('10', xToPx(10), height - pad + 6);
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('0', pad - 6, yToPx(0));
-  ctx.fillText('10', pad - 6, yToPx(10));
+  // (tick labels drawn above)
   }
 
   // Mean Squared Error for y = a x + b against points
@@ -393,39 +438,21 @@
     });
   }
 
-  function buildNumpySnippet(pts) {
-    const xs = pts.map(p => p.x);
-    const ys = pts.map(p => p.y);
-    const fmt = (arr) => '[' + arr.map(v => (Number.isInteger(v) ? v : (+v).toFixed(6).replace(/0+$/,'').replace(/\.$/,'') )).join(', ') + ']';
-    const xPy = fmt(xs);
-    const yPy = fmt(ys);
-  return `import numpy as np
+  function buildNumpySnippet() {
+    return `import numpy as np
 
 # Data from the current plot
-x = np.array(${xPy}, dtype=float)
-y = np.array(${yPy}, dtype=float)
+x = np.hstack([np.ones([3,1]),np.array([10, 1, 2], dtype=float).reshape(-1,1)])
+y = np.array([2, 10, 4], dtype=float).reshape(-1,1)
 
-def mse_grad(a, b, x, y):
-    """
-    Mean squared error: (1/n) * sum_i (a*x_i + b - y_i)**2
-    Returns column vector grad = [[db],[da]] with respect to intercept b and slope a.
-    """
-    x = np.asarray(x, dtype=float)
-    y = np.asarray(y, dtype=float)
-    n = x.shape[0]
-    r = a * x + b - y  # residuals
-    db = (2.0 / n) * np.sum(r)
-    da = (2.0 / n) * np.sum(x * r)
-    return np.array([[db], [da]], dtype=float)
 
-# Example usage
-# a, b = 0.0, 0.0
-# lr = 0.05
-# for _ in range(20):
-#     grad = mse_grad(a, b, x, y)  # shape (2,1)
-#     b -= lr * grad[0, 0]
-#     a -= lr * grad[1, 0]
-#     print(b, a)
+
+def mse_grad(p, x, y):
+    r = x@p - y  # residuals
+    return np.array([
+        [2*np.mean(r)],
+        [2*np.mean(x*r)]
+    ])
 `;
   }
 
@@ -456,7 +483,7 @@ def mse_grad(a, b, x, y):
   if (copyBtn && msgEl) {
     copyBtn.addEventListener('click', async () => {
       try {
-        const snippet = buildNumpySnippet(points);
+        const snippet = buildNumpySnippet();
         await copyToClipboard(snippet);
         msgEl.textContent = 'Copied NumPy gradient snippet';
       } catch (e) {
