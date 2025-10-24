@@ -439,20 +439,24 @@
   }
 
   function buildNumpySnippet() {
-    return `import numpy as np
+  // Build Python / NumPy snippet from the current `points` array so the
+  // copied code reflects the data shown in the plot (not hard-coded values).
+  const xs = points.map(p => Number(p.x));
+  const ys = points.map(p => Number(p.y));
+  const n = xs.length;
+  return `import numpy as np
 
 # Data from the current plot
-x = np.hstack([np.ones([3,1]),np.array([10, 1, 2], dtype=float).reshape(-1,1)])
-y = np.array([2, 10, 4], dtype=float).reshape(-1,1)
-
+x = np.hstack([np.ones([${n},1]), np.array([${xs.join(', ')}], dtype=float).reshape(-1,1)])
+y = np.array([${ys.join(', ')}], dtype=float).reshape(-1,1)
 
 
 def mse_grad(p, x, y):
-    r = x@p - y  # residuals
-    return np.array([
-        [2*np.mean(r)],
-        [2*np.mean(x*r)]
-    ])
+  r = x@p - y  # residuals
+  return np.array([
+    [2*np.mean(r)],
+    [2*np.mean(x*r)]
+  ])
 `;
   }
 
